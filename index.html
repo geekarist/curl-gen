@@ -1,0 +1,65 @@
+<html>
+<head>
+    <style type="text/css">
+    </style>
+    <script>
+    function generate() {
+        var request = document.getElementById('request').value;
+        var url = document.getElementById('url').value;
+        var method = document.getElementById('method').value;
+        var hname1 = document.getElementById('hname1').value;
+        var hvalue1 = document.getElementById('hvalue1').value;
+        var hname2 = document.getElementById('hname2').value;
+        var hvalue2 = document.getElementById('hvalue2').value;
+
+        var cmd = '';
+        if (request) {
+            cmd += 'cat > /tmp/req.xml << EOF\n'
+            cmd += request + '\nEOF\n';
+            cmd += 'curl -d@/tmp/req.xml';
+        } else {
+            cmd += 'curl';
+        }
+        if (url) {
+            cmd += ' ' + url;
+        }
+        if (method) {
+            cmd += ' -X ' + method;
+        }
+        if (hname1) {
+            cmd += ' -H ' + hname1 + ':' + hvalue1;
+        }
+        if (hname2) {
+            cmd += ' -H ' + hname2 + ':' + hvalue2;
+        }
+        document.getElementById('cmd').value = cmd;
+    }
+    </script>
+</head>
+<body>
+    <form>
+        <p><input type="text" id="url" placeholder="URL" style="width: 500px" />
+            <select id="method" id="method">
+                <option value="POST">POST</option>
+                <option value="GET">GET</option>
+            </select></p>
+            <p>
+                <input type="text" id="hname1" placeholder="Header name">
+                <input type="text" id="hvalue1" placeholder="Header value">
+            </p>
+            <p>
+                <input type="text" id="hname2" placeholder="Header name">
+                <input type="text" id="hvalue2" placeholder="Header value">
+            </p>
+            <textarea name="" id="request" cols="100" rows="20" placeholder="Request"></textarea>
+
+            <p>
+                <button onclick="generate(); return false;">Generate</button>
+            </p>
+
+            <p>
+                <textarea cols="100" rows="20" placeholder="Generated command" id="cmd" onclick="this.select()"></textarea>
+            </p>
+        </form>
+    </body>
+    </html>
