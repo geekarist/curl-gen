@@ -1,64 +1,62 @@
-<html>
+<html ng-app="curlGenApp">
 <head>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
     <style type="text/css">
     </style>
     <script>
-    function generate() {
-        var request = document.getElementById('request').value;
-        var url = document.getElementById('url').value;
-        var method = document.getElementById('method').value;
-        var hname1 = document.getElementById('hname1').value;
-        var hvalue1 = document.getElementById('hvalue1').value;
-        var hname2 = document.getElementById('hname2').value;
-        var hvalue2 = document.getElementById('hvalue2').value;
+    var curlGenApp = angular.module('curlGenApp', []);
 
-        var cmd = '';
-        if (request) {
-            cmd += 'cat > /tmp/req.xml << EOF\n'
-            cmd += request + '\nEOF\n';
-            cmd += 'curl -d@/tmp/req.xml';
-        } else {
-            cmd += 'curl';
+    curlGenApp.controller('curlGenController', function($scope, $http) {
+        $scope.generate = function() {
+            $scope.cmd = '';
+            var tmpreq = '/tmp/curl-gen-req-$$.xml';
+            if ($scope.request) {
+                $scope.cmd += 'cat > ' + tmpreq + ' << EOF\n'
+                $scope.cmd += $scope.request + '\nEOF\n';
+                $scope.cmd += 'curl -d@' + tmpreq;
+            } else {
+                $scope.cmd += 'curl';
+            }
+            if ($scope.url) {
+                $scope.cmd += ' ' + $scope.url;
+            }
+            if ($scope.method) {
+                $scope.cmd += ' -X ' + $scope.method;
+            }
+            if ($scope.hname1) {
+                $scope.cmd += ' -H ' + $scope.hname1 + ':' + $scope.hvalue1;
+            }
+            if ($scope.hname2) {
+                $scope.cmd += ' -H ' + $scope.hname2 + ':' + $scope.hvalue2;
+            }
+            $scope.cmd += '\n';
         }
-        if (url) {
-            cmd += ' ' + url;
-        }
-        if (method) {
-            cmd += ' -X ' + method;
-        }
-        if (hname1) {
-            cmd += ' -H ' + hname1 + ':' + hvalue1;
-        }
-        if (hname2) {
-            cmd += ' -H ' + hname2 + ':' + hvalue2;
-        }
-        document.getElementById('cmd').value = cmd;
-    }
+    });
     </script>
 </head>
-<body>
+<body ng-controller="curlGenController">
     <form>
-        <p><input type="text" id="url" placeholder="URL" style="width: 500px" />
-            <select id="method" id="method">
+        <p><input type="text" id="url" ng-model="url" placeholder="URL" style="width: 500px" />
+            <select id="method" ng-model="method">
                 <option value="POST">POST</option>
                 <option value="GET">GET</option>
             </select></p>
             <p>
-                <input type="text" id="hname1" placeholder="Header name">
-                <input type="text" id="hvalue1" placeholder="Header value">
+                <input type="text" id="hname1" ng-model="hname1" placeholder="Header name">
+                <input type="text" id="hvalue1" ng-model="hvalue1" placeholder="Header value">
             </p>
             <p>
-                <input type="text" id="hname2" placeholder="Header name">
-                <input type="text" id="hvalue2" placeholder="Header value">
+                <input type="text" id="hname2" ng-model="hname2" placeholder="Header name">
+                <input type="text" id="hvalue2" ng-model="hvalue2" placeholder="Header value">
             </p>
-            <textarea name="" id="request" cols="100" rows="20" placeholder="Request"></textarea>
+            <textarea name="" id="request" cols="100" rows="20" ng-model="request" placeholder="Request"></textarea>
 
             <p>
-                <button onclick="generate(); return false;">Generate</button>
+                <button ng-click="generate()">Generate</button>
             </p>
 
             <p>
-                <textarea cols="100" rows="20" placeholder="Generated command" id="cmd" onclick="this.select()"></textarea>
+                <textarea cols="100" rows="20" placeholder="Generated command" id="cmd" ng-model="cmd" onclick="this.select()"></textarea>
             </p>
         </form>
     </body>
