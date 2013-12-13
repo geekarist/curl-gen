@@ -1,19 +1,30 @@
 <html ng-app="curlGenApp">
 <head>
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
+    <script src="http://gregpike.net/demos/angular-local-storage/angular-local-storage.js"></script>
     <style type="text/css">
     </style>
     <script>
-    var curlGenApp = angular.module('curlGenApp', []);
+    angular.module('LocalStorageModule').value('prefix', 'curl-gen');
 
-    curlGenApp.controller('curlGenController', function($scope, $http) {
+    var curlGenApp = angular.module('curlGenApp', ['LocalStorageModule']);
+
+    curlGenApp.controller('curlGenController', function($scope, $http, localStorageService) {
+        $scope.restoreForm = function() {
+            var form = localStorageService.get('form');
+            $scope.cmd = form.cmd;
+            $scope.request = form.request;
+            $scope.url = form.url;
+            $scope.method = form.method;
+            $scope.hname1 = form.hname1;
+            $scope.hvalue1 = form.hvalue1;
+            $scope.hname2 = form.hname2;
+            $scope.hvalue2 = form.hvalue2;
+        }
         $scope.generate = function() {
             $scope.cmd = '';
-            var tmpreq = '/tmp/curl-gen-req-$$.xml';
             if ($scope.request) {
-                $scope.cmd += 'cat > ' + tmpreq + ' << EOF\n'
-                $scope.cmd += $scope.request + '\nEOF\n';
-                $scope.cmd += 'curl -d@' + tmpreq;
+                $scope.cmd += 'curl -d@-';
             } else {
                 $scope.cmd += 'curl';
             }
@@ -29,13 +40,28 @@
             if ($scope.hname2) {
                 $scope.cmd += ' -H ' + $scope.hname2 + ':' + $scope.hvalue2;
             }
+            if ($scope.request) {
+                $scope.cmd += ' << EOF \n';
+                $scope.cmd += $scope.request + '\nEOF';
+            }
             $scope.cmd += '\n';
+            localStorageService.clearAll();
+            localStorageService.add('form', JSON.stringify({
+                cmd: $scope.cmd,
+                request: $scope.request,
+                url: $scope.url,
+                method: $scope.method,
+                hname1: $scope.hname1,
+                hvalue1: $scope.hvalue1,
+                hname2: $scope.hname2,
+                hvalue2: $scope.hvalue2
+            }));
         }
     });
     </script>
 </head>
 <body ng-controller="curlGenController">
-    <form>
+    <form ng-init="restoreForm()">
         <p><input type="text" id="url" ng-model="url" placeholder="URL" style="width: 500px" />
             <select id="method" ng-model="method">
                 <option value="POST">POST</option>
