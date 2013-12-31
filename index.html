@@ -35,10 +35,10 @@
                 $scope.cmd += ' -X ' + $scope.method;
             }
             if ($scope.hname1) {
-                $scope.cmd += ' -H ' + $scope.hname1 + ':' + $scope.hvalue1;
+                $scope.cmd += ' -H "' + $scope.hname1 + ':' + $scope.hvalue1 + '"';
             }
             if ($scope.hname2) {
-                $scope.cmd += ' -H ' + $scope.hname2 + ':' + $scope.hvalue2;
+                $scope.cmd += ' -H "' + $scope.hname2 + ':' + $scope.hvalue2 + '"';
             }
             $scope.cmd += '\n';
             localStorageService.clearAll();
