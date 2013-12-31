@@ -24,7 +24,7 @@
         $scope.generate = function() {
             $scope.cmd = '';
             if ($scope.request) {
-                $scope.cmd += 'curl -d@-';
+                $scope.cmd += 'echo "' + $scope.request.replace(/\"/g, '\\"') + '" | curl -d@-';
             } else {
                 $scope.cmd += 'curl';
             }
@@ -39,10 +39,6 @@
             }
             if ($scope.hname2) {
                 $scope.cmd += ' -H ' + $scope.hname2 + ':' + $scope.hvalue2;
-            }
-            if ($scope.request) {
-                $scope.cmd += ' << EOF \n';
-                $scope.cmd += $scope.request + '\nEOF';
             }
             $scope.cmd += '\n';
             localStorageService.clearAll();
